@@ -24,6 +24,11 @@ function copyAddress() {
 // Navigation and Scroll Handling
 function initializeNavigation() {
     const header = document.querySelector('header');
+    if (!header) {
+        console.warn('Header element not found. Navigation initialization aborted.');
+        return;
+    }
+    
     let lastScroll = 0;
     let isScrolling = false;
     let isNavigating = false;
@@ -33,6 +38,10 @@ function initializeNavigation() {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
+            if (!targetId || targetId === '#') {
+                return;
+            }
+            
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
@@ -58,9 +67,11 @@ function initializeNavigation() {
                 // Close mobile menu if open
                 const nav = document.querySelector('nav');
                 const mobileMenuButton = document.querySelector('.mobile-menu-toggle');
-                if (window.innerWidth <= 768) {
+                if (nav && window.innerWidth <= 768) {
                     nav.classList.remove('active');
-                    mobileMenuButton?.classList.remove('active');
+                    if (mobileMenuButton) {
+                        mobileMenuButton.classList.remove('active');
+                    }
                 }
             }
         });
@@ -68,7 +79,7 @@ function initializeNavigation() {
 
     // Scroll handling
     window.addEventListener('scroll', () => {
-        if (!isScrolling && !isNavigating) {
+        if (!header || !isScrolling && !isNavigating) {
             window.requestAnimationFrame(() => {
                 const currentScroll = window.pageYOffset;
                 
@@ -96,6 +107,8 @@ function initializeNavigation() {
 
     // Reset header visibility when reaching top or bottom of page
     window.addEventListener('scrollend', () => {
+        if (!header) return;
+        
         const currentScroll = window.pageYOffset;
         if (currentScroll <= 0) {
             header.classList.remove('scroll-down');
