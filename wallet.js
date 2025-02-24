@@ -21,12 +21,230 @@ class WalletManager {
         this.account = null;
         this.isConnected = false;
         this.provider = null;
+        this.availableWallets = [];
         this.init();
     }
 
     async init() {
         this.setupEventListeners();
         await this.checkExistingConnection();
+        await this.detectWallets();
+    }
+
+    async detectWallets() {
+        this.availableWallets = [];
+
+        // Check for MetaMask
+        if (window.ethereum?.isMetaMask) {
+            this.availableWallets.push({
+                name: 'MetaMask',
+                provider: window.ethereum,
+                icon: '<i class="fab fa-ethereum"></i>',
+                supportsBSC: true
+            });
+        }
+
+        // Check for Binance Wallet
+        if (window.BinanceChain) {
+            this.availableWallets.push({
+                name: 'Binance Wallet',
+                provider: window.BinanceChain,
+                icon: '<i class="fas fa-coins"></i>',
+                supportsBSC: true
+            });
+        }
+
+        // Check for Trust Wallet
+        if (window.ethereum?.isTrust) {
+            this.availableWallets.push({
+                name: 'Trust Wallet',
+                provider: window.ethereum,
+                icon: '<i class="fas fa-shield-alt"></i>',
+                supportsBSC: true
+            });
+        }
+
+        // Check for Phantom
+        if (window.phantom?.ethereum) {
+            this.availableWallets.push({
+                name: 'Phantom',
+                provider: window.phantom.ethereum,
+                icon: '<i class="fas fa-ghost"></i>',
+                supportsBSC: false
+            });
+        }
+
+        // Generic Web3 wallet check
+        if (window.ethereum && !this.availableWallets.some(w => w.provider === window.ethereum)) {
+            this.availableWallets.push({
+                name: 'Web3 Wallet',
+                provider: window.ethereum,
+                icon: '<i class="fas fa-wallet"></i>',
+                supportsBSC: true
+            });
+        }
+    }
+
+    createWalletSelectionDialog() {
+        // Remove existing dialog if any
+        const existingDialog = document.getElementById('wallet-selection-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+
+        const dialog = document.createElement('div');
+        dialog.id = 'wallet-selection-dialog';
+        dialog.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            z-index: 1000;
+            min-width: 300px;
+            border: 1px solid var(--primary-gold);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        `;
+
+        const title = document.createElement('h3');
+        title.textContent = 'Select a Wallet';
+        title.style.cssText = `
+            color: var(--primary-gold);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        `;
+
+        const walletList = document.createElement('div');
+        walletList.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        `;
+
+        const supportedWallets = this.availableWallets.filter(wallet => wallet.supportsBSC);
+        
+        if (supportedWallets.length === 0) {
+            const message = document.createElement('p');
+            message.textContent = 'No BSC-compatible wallets found. Please install MetaMask, Trust Wallet, or Binance Wallet.';
+            message.style.cssText = `
+                color: #fff;
+                text-align: center;
+                margin-bottom: 1rem;
+            `;
+            walletList.appendChild(message);
+        } else {
+            supportedWallets.forEach(wallet => {
+                const button = document.createElement('button');
+                button.innerHTML = `${wallet.icon} ${wallet.name}`;
+                button.style.cssText = `
+                    background: rgba(255, 215, 0, 0.1);
+                    border: 1px solid var(--primary-gold);
+                    color: var(--primary-gold);
+                    padding: 1rem;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    transition: all 0.3s ease;
+                    justify-content: center;
+                `;
+                button.onmouseover = () => {
+                    button.style.background = 'rgba(255, 215, 0, 0.2)';
+                    button.style.transform = 'translateY(-2px)';
+                };
+                button.onmouseout = () => {
+                    button.style.background = 'rgba(255, 215, 0, 0.1)';
+                    button.style.transform = 'translateY(0)';
+                };
+                button.onclick = () => this.proceedWithWallet(wallet);
+                walletList.appendChild(button);
+            });
+        }
+
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '&times;';
+        closeButton.style.cssText = `
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--primary-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+        `;
+        closeButton.onclick = () => dialog.remove();
+
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+        `;
+        overlay.onclick = () => {
+            dialog.remove();
+            overlay.remove();
+        };
+
+        dialog.appendChild(closeButton);
+        dialog.appendChild(title);
+        dialog.appendChild(walletList);
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
+    }
+
+    async proceedWithWallet(wallet) {
+        // Remove the dialog
+        const dialog = document.getElementById('wallet-selection-dialog');
+        const overlay = dialog.previousSibling;
+        if (dialog) dialog.remove();
+        if (overlay) overlay.remove();
+
+        try {
+            this.provider = wallet.provider;
+            
+            // Request account access
+            const accounts = await this.provider.request({ method: 'eth_requestAccounts' });
+            this.account = accounts[0];
+            
+            // Initialize Web3
+            this.web3 = new Web3(this.provider);
+            
+            // Check and switch to BSC network
+            await this.ensureBSCNetwork();
+            
+            // Initialize contract
+            this.contract = new this.web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+            
+            this.isConnected = true;
+            await this.updateUI();
+            this.startDataRefresh();
+            
+        } catch (error) {
+            console.error('Error connecting wallet:', error);
+            if (error.code === 4001) {
+                alert('Please accept the connection request in your wallet.');
+            } else {
+                alert('Error connecting wallet: ' + error.message);
+            }
+        }
+    }
+
+    async connectWallet() {
+        await this.detectWallets();
+        this.createWalletSelectionDialog();
     }
 
     async checkExistingConnection() {
@@ -62,53 +280,6 @@ class WalletManager {
             window.ethereum.on('chainChanged', () => {
                 window.location.reload();
             });
-        }
-    }
-
-    async connectWallet() {
-        try {
-            // Check for various wallet providers
-            let provider = null;
-            
-            if (window.phantom?.solana && window.phantom?.ethereum) {
-                // User has Phantom wallet installed
-                provider = window.phantom.ethereum;
-            } else if (window.ethereum) {
-                // MetaMask or other Web3 wallet
-                provider = window.ethereum;
-            }
-
-            if (!provider) {
-                alert('Please install MetaMask or Phantom wallet to use this feature.');
-                return;
-            }
-
-            this.provider = provider;
-            
-            // Request account access
-            const accounts = await provider.request({ method: 'eth_requestAccounts' });
-            this.account = accounts[0];
-            
-            // Initialize Web3
-            this.web3 = new Web3(provider);
-            
-            // Check and switch to BSC network
-            await this.ensureBSCNetwork();
-            
-            // Initialize contract
-            this.contract = new this.web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-            
-            this.isConnected = true;
-            await this.updateUI();
-            this.startDataRefresh();
-            
-        } catch (error) {
-            console.error('Error connecting wallet:', error);
-            if (error.code === 4001) {
-                alert('Please accept the connection request in your wallet.');
-            } else {
-                alert('Error connecting wallet. Please make sure you are using a BSC-compatible wallet.');
-            }
         }
     }
 
