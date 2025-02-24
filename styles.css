@@ -1861,4 +1861,103 @@ footer {
         letter-spacing: 0.4px;
         margin-bottom: 0.75rem;
     }
+}
+
+.rewards-dashboard {
+    padding: 3rem;
+    text-align: center;
+    margin: 2rem auto;
+    max-width: 1000px;
+}
+
+.rewards-dashboard h2 {
+    margin-bottom: 2rem;
+    color: var(--primary-gold);
+}
+
+.rewards-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.reward-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    transition: all var(--transition-speed) ease;
+}
+
+.reward-stat:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-gold);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.reward-stat .stat-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.reward-stat .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-gold);
+}
+
+.rewards-actions {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.rewards-actions .cta-button {
+    min-width: 200px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.rewards-actions .cta-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.rewards-actions .cta-button i {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .rewards-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .rewards-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .rewards-actions .cta-button {
+        width: 100%;
+    }
+
+    .reward-stat {
+        padding: 1rem;
+    }
+
+    .reward-stat .stat-value {
+        font-size: 1.3rem;
+    }
 } 
