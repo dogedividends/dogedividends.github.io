@@ -1,47 +1,59 @@
 // Wait for DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", async function() {
-    // Initialize all interactive elements
-    initializeNavigation();
-    initializeAnimations();
-    initializeTokenStats();
-    initializeMobileMenu();
-    initializeParallax();
-    initializeCountdown();
-    initializeButtons();
-    
-    // Initialize Web3 and wallet connection
-    await initializeWeb3();
-    
-    // Add event listeners for wallet connection
-    const connectWalletBtn = document.getElementById('connectWallet');
-    const claimRewardsBtn = document.getElementById('claimRewards');
-    
-    if (connectWalletBtn) {
-        connectWalletBtn.addEventListener('click', async () => {
-            try {
-                await connectWallet();
-            } catch (error) {
-                console.error('Error connecting wallet:', error);
-            }
-        });
-    }
-    
-    if (claimRewardsBtn) {
-        claimRewardsBtn.addEventListener('click', async () => {
-            try {
-                await claimRewards();
-            } catch (error) {
-                console.error('Error claiming rewards:', error);
-            }
-        });
-    }
-
-    // Update rewards info every 30 seconds if wallet is connected
-    setInterval(() => {
-        if (userAddress) {
-            updateRewardsInfo();
+    try {
+        // First check if Web3 is available
+        if (typeof window.ethereum !== 'undefined') {
+            // Initialize Web3 first
+            await initializeWeb3();
         }
-    }, 30000);
+
+        // Initialize UI components after Web3
+        initializeNavigation();
+        initializeAnimations();
+        initializeTokenStats();
+        initializeMobileMenu();
+        initializeParallax();
+        initializeCountdown();
+        initializeButtons();
+        
+        // Add event listeners for wallet connection
+        const connectWalletBtn = document.getElementById('connectWallet');
+        if (connectWalletBtn) {
+            connectWalletBtn.removeEventListener('click', connectWallet); // Remove any existing listeners
+            connectWalletBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await connectWallet();
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                }
+            });
+        }
+        
+        const claimRewardsBtn = document.getElementById('claimRewards');
+        if (claimRewardsBtn) {
+            claimRewardsBtn.removeEventListener('click', claimRewards); // Remove any existing listeners
+            claimRewardsBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await claimRewards();
+                } catch (error) {
+                    console.error('Error claiming rewards:', error);
+                }
+            });
+        }
+
+        // Set up periodic rewards update
+        if (typeof window.ethereum !== 'undefined') {
+            setInterval(() => {
+                if (userAddress) {
+                    updateRewardsInfo();
+                }
+            }, 30000);
+        }
+    } catch (error) {
+        console.error('Error during initialization:', error);
+    }
 });
 
 function copyAddress() {
@@ -183,15 +195,24 @@ function initializeTokenStats() {
         const mockMarketCap = (mockPrice * 1000000000).toFixed(2);
         const mockBurned = Math.floor(Math.random() * 1000000) + 5000000;
 
-        // Animate number changes
-        animateValue('price', mockPrice, '$');
-        animateValue('holders', mockHolders);
-        animateValue('marketcap', (mockMarketCap/1000000).toFixed(2), '$', 'M');
-        animateValue('burned-tokens', mockBurned);
+        // Only animate if elements exist
+        const elements = {
+            price: document.getElementById('price'),
+            holders: document.getElementById('holders'),
+            marketcap: document.getElementById('marketcap'),
+            burned: document.getElementById('burned-tokens')
+        };
+
+        if (elements.price) animateValue('price', mockPrice, '$');
+        if (elements.holders) animateValue('holders', mockHolders);
+        if (elements.marketcap) animateValue('marketcap', (mockMarketCap/1000000).toFixed(2), '$', 'M');
+        if (elements.burned) animateValue('burned-tokens', mockBurned);
     }
 
     function animateValue(elementId, value, prefix = '', suffix = '') {
         const element = document.getElementById(elementId);
+        if (!element) return; // Skip animation if element doesn't exist
+        
         const start = parseFloat(element.textContent.replace(/[^0-9.-]+/g, '')) || 0;
         const end = parseFloat(value);
         const duration = 1000;
