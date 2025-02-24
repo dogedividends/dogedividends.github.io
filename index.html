@@ -9,19 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
-    <script src="wallet.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
     <div class="top-social-bar">
         <div class="container">
             <div class="social-links">
-                <button id="connect-wallet" class="wallet-button">
-                    <i class="fas fa-wallet"></i>
-                    <span>Connect Wallet</span>
-                </button>
                 <a href="https://t.me/DOGEDBSCPORTAL" class="social-link">
                     <img src="assets/logos/telegram.png" alt="Telegram" class="social-icon">
                     <span>Telegram</span>
@@ -268,53 +261,6 @@
                             <i class="fab fa-twitter"></i> Twitter
                         </a>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="rewards-dashboard" class="glass-card">
-            <div class="container">
-                <h2>DOGE Rewards Dashboard</h2>
-                <div class="rewards-grid">
-                    <div class="rewards-card">
-                        <div class="rewards-icon">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                        <h3>Total DOGE Distributed</h3>
-                        <div class="rewards-value" id="total-distributed">
-                            <span class="loading">Loading...</span>
-                        </div>
-                    </div>
-                    
-                    <div class="rewards-card">
-                        <div class="rewards-icon">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <h3>Your Pending Rewards</h3>
-                        <div class="rewards-value" id="pending-rewards">
-                            <span class="connect-prompt">Connect wallet to view</span>
-                        </div>
-                    </div>
-
-                    <div class="rewards-card">
-                        <div class="rewards-icon">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <h3>Your Total Claimed</h3>
-                        <div class="rewards-value" id="total-claimed">
-                            <span class="connect-prompt">Connect wallet to view</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="rewards-actions">
-                    <button id="claim-rewards" class="cta-button" disabled>
-                        <span class="button-content">
-                            <i class="fas fa-gift"></i>
-                            Claim DOGE Rewards
-                        </span>
-                    </button>
-                    <p class="rewards-note">Rewards are distributed automatically every 60 minutes when threshold is met. You can also claim manually.</p>
                 </div>
             </div>
         </section>
