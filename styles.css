@@ -1863,101 +1863,121 @@ footer {
     }
 }
 
-.rewards-dashboard {
-    padding: 3rem;
-    text-align: center;
-    margin: 2rem auto;
-    max-width: 1000px;
+/* Wallet Button */
+.wallet-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(45deg, var(--primary-gold), var(--secondary-gold));
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.rewards-dashboard h2 {
-    margin-bottom: 2rem;
+.wallet-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.wallet-button.connected {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--primary-gold);
     color: var(--primary-gold);
 }
 
-.rewards-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    margin-bottom: 3rem;
+/* Rewards Dashboard */
+#rewards-dashboard {
+    padding: 4rem 0;
+    background: rgba(0, 0, 0, 0.2);
 }
 
-.reward-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
+.rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.rewards-card {
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
     border: 1px solid rgba(255, 215, 0, 0.1);
     transition: all var(--transition-speed) ease;
 }
 
-.reward-stat:hover {
+.rewards-card:hover {
     transform: translateY(-5px);
     border-color: var(--primary-gold);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.reward-stat .stat-label {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.8;
+.rewards-icon {
+    font-size: 2rem;
+    color: var(--primary-gold);
+    margin-bottom: 1rem;
 }
 
-.reward-stat .stat-value {
+.rewards-value {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--primary-gold);
+    margin-top: 1rem;
+}
+
+.rewards-value .loading {
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+.rewards-value .connect-prompt {
+    font-size: 0.9rem;
+    opacity: 0.7;
 }
 
 .rewards-actions {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    margin-top: 2rem;
+    text-align: center;
+    margin-top: 3rem;
 }
 
-.rewards-actions .cta-button {
+.rewards-note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+#claim-rewards {
     min-width: 200px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
 }
 
-.rewards-actions .cta-button:disabled {
+#claim-rewards:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
-}
-
-.rewards-actions .cta-button i {
-    font-size: 1.2rem;
 }
 
 @media (max-width: 768px) {
-    .rewards-stats {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+    .wallet-button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
     }
-
-    .rewards-actions {
-        flex-direction: column;
-        gap: 1rem;
+    
+    .rewards-grid {
+        gap: 1.5rem;
+        margin: 2rem 0;
     }
-
-    .rewards-actions .cta-button {
-        width: 100%;
+    
+    .rewards-card {
+        padding: 1.5rem;
     }
-
-    .reward-stat {
-        padding: 1rem;
-    }
-
-    .reward-stat .stat-value {
+    
+    .rewards-value {
         font-size: 1.3rem;
     }
 } 

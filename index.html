@@ -11,12 +11,17 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
+    <script src="wallet.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
     <div class="top-social-bar">
         <div class="container">
             <div class="social-links">
+                <button id="connect-wallet" class="wallet-button">
+                    <i class="fas fa-wallet"></i>
+                    <span>Connect Wallet</span>
+                </button>
                 <a href="https://t.me/DOGEDBSCPORTAL" class="social-link">
                     <img src="assets/logos/telegram.png" alt="Telegram" class="social-icon">
                     <span>Telegram</span>
@@ -206,31 +211,39 @@
         
         <section id="developments">
             <div class="container">
-                <div class="rewards-dashboard glass-card">
-                    <h2>Rewards Dashboard</h2>
-                    <div class="rewards-stats">
-                        <div class="reward-stat">
-                            <span class="stat-label">Total DOGE Distributed</span>
-                            <span class="stat-value" id="totalDistributed">Connect Wallet</span>
-                        </div>
-                        <div class="reward-stat">
-                            <span class="stat-label">Your Claimable DOGE</span>
-                            <span class="stat-value" id="claimableRewards">Connect Wallet</span>
-                        </div>
-                        <div class="reward-stat">
-                            <span class="stat-label">Your Total Earned</span>
-                            <span class="stat-value" id="totalEarned">Connect Wallet</span>
+                <h2>Recent Developments & Vision</h2>
+                <p class="section-subtitle">Political discussions suggest potential benefits such as tax refunds linked to savings from $DOGE-related initiatives:</p>
+                <div class="developments-grid">
+                    <div class="development-card">
+                        <div class="development-icon">💰</div>
+                        <h3>Potential Tax Refund</h3>
+                        <p>A reported proposal is aimed at offering $5,000 to US taxpayers as $DOGE aims to cut down significant government waste.</p>
+                        <div class="development-highlight">
+                            <span class="highlight-value">$5,000</span>
+                            <span class="highlight-label">Proposed Refund</span>
                         </div>
                     </div>
-                    <div class="rewards-actions">
-                        <button id="connectWallet" class="cta-button">
-                            <i class="fas fa-wallet"></i>
-                            <span>Connect Wallet</span>
-                        </button>
-                        <button id="claimRewards" class="cta-button" disabled>
-                            <i class="fas fa-gift"></i>
-                            <span>Claim Rewards</span>
-                        </button>
+                    
+                    <div class="development-card">
+                        <div class="development-icon">🚀</div>
+                        <h3>Elon Musk's Clarification</h3>
+                        <p>Musk has commented that any tax reduction is contingent on the savings $DOGE achieves, with an emphasis on deficit reduction and economic stability.</p>
+                        <div class="development-highlight">
+                            <span class="highlight-value">Verified</span>
+                            <span class="highlight-label">By Elon Musk</span>
+                        </div>
+                    </div>
+                    
+                    <div class="development-card">
+                        <div class="development-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Presidential Update</h3>
+                        <p>Current estimates suggest a $1,000 benefit per taxpayer related to these initiatives.</p>
+                        <div class="development-highlight">
+                            <span class="highlight-value">$1,000</span>
+                            <span class="highlight-label">Estimated Benefit</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -255,6 +268,53 @@
                             <i class="fab fa-twitter"></i> Twitter
                         </a>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rewards-dashboard" class="glass-card">
+            <div class="container">
+                <h2>DOGE Rewards Dashboard</h2>
+                <div class="rewards-grid">
+                    <div class="rewards-card">
+                        <div class="rewards-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3>Total DOGE Distributed</h3>
+                        <div class="rewards-value" id="total-distributed">
+                            <span class="loading">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rewards-card">
+                        <div class="rewards-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h3>Your Pending Rewards</h3>
+                        <div class="rewards-value" id="pending-rewards">
+                            <span class="connect-prompt">Connect wallet to view</span>
+                        </div>
+                    </div>
+
+                    <div class="rewards-card">
+                        <div class="rewards-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h3>Your Total Claimed</h3>
+                        <div class="rewards-value" id="total-claimed">
+                            <span class="connect-prompt">Connect wallet to view</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rewards-actions">
+                    <button id="claim-rewards" class="cta-button" disabled>
+                        <span class="button-content">
+                            <i class="fas fa-gift"></i>
+                            Claim DOGE Rewards
+                        </span>
+                    </button>
+                    <p class="rewards-note">Rewards are distributed automatically every 60 minutes when threshold is met. You can also claim manually.</p>
                 </div>
             </div>
         </section>

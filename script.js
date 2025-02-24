@@ -1,59 +1,13 @@
 // Wait for DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", async function() {
-    try {
-        // First check if Web3 is available
-        if (typeof window.ethereum !== 'undefined') {
-            // Initialize Web3 first
-            await initializeWeb3();
-        }
-
-        // Initialize UI components after Web3
-        initializeNavigation();
-        initializeAnimations();
-        initializeTokenStats();
-        initializeMobileMenu();
-        initializeParallax();
-        initializeCountdown();
-        initializeButtons();
-        
-        // Add event listeners for wallet connection
-        const connectWalletBtn = document.getElementById('connectWallet');
-        if (connectWalletBtn) {
-            connectWalletBtn.removeEventListener('click', connectWallet); // Remove any existing listeners
-            connectWalletBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    await connectWallet();
-                } catch (error) {
-                    console.error('Error connecting wallet:', error);
-                }
-            });
-        }
-        
-        const claimRewardsBtn = document.getElementById('claimRewards');
-        if (claimRewardsBtn) {
-            claimRewardsBtn.removeEventListener('click', claimRewards); // Remove any existing listeners
-            claimRewardsBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    await claimRewards();
-                } catch (error) {
-                    console.error('Error claiming rewards:', error);
-                }
-            });
-        }
-
-        // Set up periodic rewards update
-        if (typeof window.ethereum !== 'undefined') {
-            setInterval(() => {
-                if (userAddress) {
-                    updateRewardsInfo();
-                }
-            }, 30000);
-        }
-    } catch (error) {
-        console.error('Error during initialization:', error);
-    }
+document.addEventListener("DOMContentLoaded", function() {
+    // Initialize all interactive elements
+    initializeNavigation();
+    initializeAnimations();
+    initializeTokenStats();
+    initializeMobileMenu();
+    initializeParallax();
+    initializeCountdown();
+    initializeButtons();
 });
 
 function copyAddress() {
@@ -195,24 +149,15 @@ function initializeTokenStats() {
         const mockMarketCap = (mockPrice * 1000000000).toFixed(2);
         const mockBurned = Math.floor(Math.random() * 1000000) + 5000000;
 
-        // Only animate if elements exist
-        const elements = {
-            price: document.getElementById('price'),
-            holders: document.getElementById('holders'),
-            marketcap: document.getElementById('marketcap'),
-            burned: document.getElementById('burned-tokens')
-        };
-
-        if (elements.price) animateValue('price', mockPrice, '$');
-        if (elements.holders) animateValue('holders', mockHolders);
-        if (elements.marketcap) animateValue('marketcap', (mockMarketCap/1000000).toFixed(2), '$', 'M');
-        if (elements.burned) animateValue('burned-tokens', mockBurned);
+        // Animate number changes
+        animateValue('price', mockPrice, '$');
+        animateValue('holders', mockHolders);
+        animateValue('marketcap', (mockMarketCap/1000000).toFixed(2), '$', 'M');
+        animateValue('burned-tokens', mockBurned);
     }
 
     function animateValue(elementId, value, prefix = '', suffix = '') {
         const element = document.getElementById(elementId);
-        if (!element) return; // Skip animation if element doesn't exist
-        
         const start = parseFloat(element.textContent.replace(/[^0-9.-]+/g, '')) || 0;
         const end = parseFloat(value);
         const duration = 1000;
@@ -352,178 +297,4 @@ function initializeButtons() {
             this.style.transform = 'translateY(0)';
         });
     });
-}
-
-// Web3 Integration
-const CONTRACT_ADDRESS = '0xfdac5dd5d3397c81b6fb3b659d8607e1ffac7287';
-const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"owner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"_claimDividend","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"circulatingSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"distributorGas","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"shareholder","type":"address"}],"name":"getUnpaidEarnings","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isDividendExempt","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isFeeExempt","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"isOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"minDistribution","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"minPeriod","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"pair","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"rescueERC20","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"reward","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_minPeriod","type":"uint256"},{"internalType":"uint256","name":"_minDistribution","type":"uint256"},{"internalType":"uint256","name":"_distributorGas","type":"uint256"}],"name":"setDistributionCriteria","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_buy","type":"uint256"},{"internalType":"uint256","name":"_trans","type":"uint256"},{"internalType":"uint256","name":"_wallet","type":"uint256"}],"name":"setParameters","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_liquidity","type":"uint256"},{"internalType":"uint256","name":"_marketing","type":"uint256"},{"internalType":"uint256","name":"_burn","type":"uint256"},{"internalType":"uint256","name":"_rewards","type":"uint256"},{"internalType":"uint256","name":"_development","type":"uint256"},{"internalType":"uint256","name":"_total","type":"uint256"},{"internalType":"uint256","name":"_sell","type":"uint256"},{"internalType":"uint256","name":"_trans","type":"uint256"}],"name":"setStructure","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"},{"internalType":"bool","name":"_enabled","type":"bool"}],"name":"setisBot","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"holder","type":"address"},{"internalType":"bool","name":"exempt","type":"bool"}],"name":"setisDividendExempt","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"},{"internalType":"bool","name":"_enabled","type":"bool"}],"name":"setisExempt","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"shares","outputs":[{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"totalExcluded","type":"uint256"},{"internalType":"uint256","name":"totalRealised","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"startTrading","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"totalDistributed","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalDividends","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_wallet","type":"address"}],"name":"totalRewardsDistributed","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalShares","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address payable","name":"adr","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
-
-let web3;
-let contract;
-let userAddress;
-
-async function initializeWeb3() {
-    console.log('Initializing Web3...');
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            console.log('MetaMask is installed!');
-            web3 = new Web3(window.ethereum);
-            contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-            
-            // Check if already connected
-            const accounts = await web3.eth.getAccounts();
-            console.log('Current accounts:', accounts);
-            
-            if (accounts.length > 0) {
-                userAddress = accounts[0];
-                updateConnectButton();
-                updateRewardsInfo();
-                document.getElementById('claimRewards').disabled = false;
-            }
-
-            // Listen for account changes
-            window.ethereum.on('accountsChanged', handleAccountsChanged);
-            window.ethereum.on('chainChanged', () => window.location.reload());
-            
-            console.log('Web3 initialization complete!');
-        } catch (error) {
-            console.error('Error initializing Web3:', error);
-        }
-    } else {
-        console.log('Please install MetaMask!');
-        const connectButton = document.getElementById('connectWallet');
-        if (connectButton) {
-            connectButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Install MetaMask</span>';
-            connectButton.addEventListener('click', () => {
-                window.open('https://metamask.io', '_blank');
-            });
-        }
-    }
-}
-
-function handleAccountsChanged(accounts) {
-    if (accounts.length > 0) {
-        userAddress = accounts[0];
-        updateConnectButton();
-        updateRewardsInfo();
-        document.getElementById('claimRewards').disabled = false;
-    } else {
-        userAddress = null;
-        updateConnectButton();
-        document.getElementById('claimRewards').disabled = true;
-        document.getElementById('totalDistributed').textContent = 'Connect Wallet';
-        document.getElementById('claimableRewards').textContent = 'Connect Wallet';
-        document.getElementById('totalEarned').textContent = 'Connect Wallet';
-    }
-}
-
-async function connectWallet() {
-    console.log('Attempting to connect wallet...');
-    if (typeof window.ethereum === 'undefined') {
-        console.log('MetaMask not found, redirecting to install page');
-        window.open('https://metamask.io', '_blank');
-        return;
-    }
-
-    try {
-        console.log('Requesting account access...');
-        // Request account access
-        const accounts = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
-        });
-        
-        console.log('Accounts received:', accounts);
-        
-        // Check if we're on the correct network (BSC)
-        const chainId = await window.ethereum.request({ 
-            method: 'eth_chainId' 
-        });
-        
-        console.log('Current chainId:', chainId);
-        
-        if (chainId !== '0x38') { // BSC Mainnet
-            try {
-                console.log('Switching to BSC network...');
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }],
-                });
-            } catch (switchError) {
-                // If BSC network is not added, add it
-                if (switchError.code === 4902) {
-                    try {
-                        console.log('Adding BSC network...');
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x38',
-                                chainName: 'Binance Smart Chain',
-                                nativeCurrency: {
-                                    name: 'BNB',
-                                    symbol: 'BNB',
-                                    decimals: 18
-                                },
-                                rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                                blockExplorerUrls: ['https://bscscan.com/']
-                            }]
-                        });
-                    } catch (addError) {
-                        console.error('Error adding BSC network:', addError);
-                    }
-                }
-            }
-        }
-
-        userAddress = accounts[0];
-        console.log('Wallet connected:', userAddress);
-        updateConnectButton();
-        updateRewardsInfo();
-        document.getElementById('claimRewards').disabled = false;
-    } catch (error) {
-        console.error('Error connecting wallet:', error);
-    }
-}
-
-function updateConnectButton() {
-    const connectButton = document.getElementById('connectWallet');
-    if (userAddress) {
-        connectButton.innerHTML = `<i class="fas fa-wallet"></i><span>${userAddress.substring(0, 6)}...${userAddress.substring(38)}</span>`;
-    } else {
-        connectButton.innerHTML = '<i class="fas fa-wallet"></i><span>Connect Wallet</span>';
-    }
-}
-
-async function updateRewardsInfo() {
-    if (!userAddress) return;
-
-    try {
-        // Get total DOGE distributed
-        const totalDistributed = await contract.methods.totalDistributed().call();
-        document.getElementById('totalDistributed').textContent = formatDoge(totalDistributed);
-
-        // Get claimable rewards
-        const claimable = await contract.methods.getUnpaidEarnings(userAddress).call();
-        document.getElementById('claimableRewards').textContent = formatDoge(claimable);
-
-        // Get total earned
-        const totalEarned = await contract.methods.totalRewardsDistributed(userAddress).call();
-        document.getElementById('totalEarned').textContent = formatDoge(totalEarned);
-    } catch (error) {
-        console.error('Error updating rewards info:', error);
-    }
-}
-
-function formatDoge(amount) {
-    return (amount / 1e18).toFixed(2) + ' DOGE';
-}
-
-async function claimRewards() {
-    if (!userAddress) return;
-
-    try {
-        await contract.methods._claimDividend().send({ from: userAddress });
-        updateRewardsInfo();
-    } catch (error) {
-        console.error('Error claiming rewards:', error);
-    }
 }
