@@ -1,26 +1,43 @@
 const CONTRACT_ADDRESS = '0xfdac5dd5d3397c81b6fb3b659d8607e1ffac7287';
 const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"owner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"_claimDividend","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalDistributed","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_wallet","type":"address"}],"name":"totalRewardsDistributed","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"shareholder","type":"address"}],"name":"getUnpaidEarnings","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
 
+const BSC_CHAIN_ID = '0x38'; // BSC Mainnet
+const BSC_NETWORK_CONFIG = {
+    chainId: BSC_CHAIN_ID,
+    chainName: 'Binance Smart Chain',
+    nativeCurrency: {
+        name: 'BNB',
+        symbol: 'BNB',
+        decimals: 18
+    },
+    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    blockExplorerUrls: ['https://bscscan.com/']
+};
+
 class WalletManager {
     constructor() {
         this.web3 = null;
         this.contract = null;
         this.account = null;
         this.isConnected = false;
+        this.provider = null;
         this.init();
     }
 
     async init() {
         this.setupEventListeners();
-        if (typeof window.ethereum !== 'undefined') {
-            // Check if already connected
+        await this.checkExistingConnection();
+    }
+
+    async checkExistingConnection() {
+        if (window.ethereum) {
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                 if (accounts.length > 0) {
-                    this.connectWallet();
+                    await this.connectWallet();
                 }
             } catch (error) {
-                console.error('Error checking wallet connection:', error);
+                console.error('Error checking existing connection:', error);
             }
         }
     }
@@ -33,10 +50,10 @@ class WalletManager {
         claimButton.addEventListener('click', () => this.claimRewards());
 
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
+            window.ethereum.on('accountsChanged', async (accounts) => {
                 if (accounts.length > 0) {
                     this.account = accounts[0];
-                    this.updateUI();
+                    await this.updateUI();
                 } else {
                     this.disconnectWallet();
                 }
@@ -49,60 +66,83 @@ class WalletManager {
     }
 
     async connectWallet() {
-        if (typeof window.ethereum !== 'undefined') {
-            try {
-                // Request account access
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                this.account = accounts[0];
-                
-                // Initialize Web3
-                this.web3 = new Web3(window.ethereum);
-                
-                // Check if we're on BSC
-                const chainId = await this.web3.eth.getChainId();
-                if (chainId !== 56) {
-                    await this.switchToBSC();
-                }
-                
-                // Initialize contract
-                this.contract = new this.web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-                
-                this.isConnected = true;
-                this.updateUI();
-                this.startDataRefresh();
-                
-            } catch (error) {
-                console.error('Error connecting wallet:', error);
-                alert('Error connecting wallet. Please try again.');
+        try {
+            // Check for various wallet providers
+            let provider = null;
+            
+            if (window.phantom?.solana && window.phantom?.ethereum) {
+                // User has Phantom wallet installed
+                provider = window.phantom.ethereum;
+            } else if (window.ethereum) {
+                // MetaMask or other Web3 wallet
+                provider = window.ethereum;
             }
-        } else {
-            alert('Please install MetaMask or another Web3 wallet to use this feature.');
+
+            if (!provider) {
+                alert('Please install MetaMask or Phantom wallet to use this feature.');
+                return;
+            }
+
+            this.provider = provider;
+            
+            // Request account access
+            const accounts = await provider.request({ method: 'eth_requestAccounts' });
+            this.account = accounts[0];
+            
+            // Initialize Web3
+            this.web3 = new Web3(provider);
+            
+            // Check and switch to BSC network
+            await this.ensureBSCNetwork();
+            
+            // Initialize contract
+            this.contract = new this.web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+            
+            this.isConnected = true;
+            await this.updateUI();
+            this.startDataRefresh();
+            
+        } catch (error) {
+            console.error('Error connecting wallet:', error);
+            if (error.code === 4001) {
+                alert('Please accept the connection request in your wallet.');
+            } else {
+                alert('Error connecting wallet. Please make sure you are using a BSC-compatible wallet.');
+            }
+        }
+    }
+
+    async ensureBSCNetwork() {
+        try {
+            const chainId = await this.web3.eth.getChainId();
+            if (chainId !== parseInt(BSC_CHAIN_ID, 16)) {
+                await this.switchToBSC();
+            }
+        } catch (error) {
+            console.error('Error ensuring BSC network:', error);
+            throw error;
         }
     }
 
     async switchToBSC() {
         try {
-            await window.ethereum.request({
+            await this.provider.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x38' }], // BSC mainnet
+                params: [{ chainId: BSC_CHAIN_ID }]
             });
         } catch (error) {
-            if (error.code === 4902) {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [{
-                        chainId: '0x38',
-                        chainName: 'Binance Smart Chain',
-                        nativeCurrency: {
-                            name: 'BNB',
-                            symbol: 'BNB',
-                            decimals: 18
-                        },
-                        rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                        blockExplorerUrls: ['https://bscscan.com/']
-                    }]
-                });
+            if (error.code === 4902 || error.code === -32603) {
+                try {
+                    await this.provider.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [BSC_NETWORK_CONFIG]
+                    });
+                } catch (addError) {
+                    console.error('Error adding BSC network:', addError);
+                    throw new Error('Please add Binance Smart Chain to your wallet manually.');
+                }
             } else {
+                console.error('Error switching to BSC:', error);
                 throw error;
             }
         }
