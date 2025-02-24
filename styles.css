@@ -1796,4 +1796,69 @@ footer {
     .social-link span {
         font-size: 0.7rem;
     }
+}
+
+.footer-email {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+    font-size: 1rem;
+}
+
+.footer-email:hover {
+    color: var(--primary-gold);
+}
+
+.footer-email i {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .footer-email {
+        justify-content: center;
+    }
+}
+
+.disclaimer {
+    margin: 3rem 0;
+    padding: 2.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    text-align: left;
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.disclaimer p {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.5px;
+    font-weight: 400;
+    max-width: 1000px;
+    margin: 0 auto 1rem;
+}
+
+.disclaimer p:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .disclaimer {
+        margin: 2rem 0;
+        padding: 1.75rem;
+    }
+
+    .disclaimer p {
+        font-size: 0.75rem;
+        line-height: 1.7;
+        letter-spacing: 0.4px;
+        margin-bottom: 0.75rem;
+    }
 } 
