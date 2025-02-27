@@ -385,17 +385,75 @@ async function checkAvailableDividends(account) {
     try {
         // Call the getUnpaidEarnings function
         const unpaidEarnings = await contract.methods.getUnpaidEarnings(account).call();
+        console.log("Raw unpaidEarnings value:", unpaidEarnings);
         
         // Convert from wei to ether and update UI
         const earningsInDoge = web3.utils.fromWei(unpaidEarnings, 'ether');
+        console.log("Converted earningsInDoge value:", earningsInDoge);
+        
         const availableDividends = document.getElementById('available-dividends');
         
         if (availableDividends) {
-            availableDividends.textContent = parseFloat(earningsInDoge).toFixed(8);
+            // Format the value with appropriate precision for small numbers
+            let formattedEarnings;
+            if (parseFloat(earningsInDoge) < 0.001) {
+                // For very small numbers, use fixed decimal places instead of scientific notation
+                formattedEarnings = parseFloat(earningsInDoge).toFixed(9);
+                console.log("Using fixed notation for small value:", formattedEarnings);
+            } else {
+                formattedEarnings = parseFloat(earningsInDoge).toLocaleString(undefined, {
+                    minimumFractionDigits: 8,
+                    maximumFractionDigits: 8
+                });
+                console.log("Using locale string for normal value:", formattedEarnings);
+            }
+            availableDividends.textContent = formattedEarnings;
         }
         
     } catch (error) {
         console.error("Error checking dividends:", error);
+        
+        // Try with backup RPC URL
+        try {
+            console.log("Trying backup RPC URL for checking dividends...");
+            const backupWeb3 = new Web3(BSC_RPC_URL_BACKUP);
+            const backupContract = new backupWeb3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+            
+            // Call the getUnpaidEarnings function
+            const unpaidEarnings = await backupContract.methods.getUnpaidEarnings(account).call();
+            console.log("Raw unpaidEarnings value (backup):", unpaidEarnings);
+            
+            // Convert from wei to ether and update UI
+            const earningsInDoge = backupWeb3.utils.fromWei(unpaidEarnings, 'ether');
+            console.log("Converted earningsInDoge value (backup):", earningsInDoge);
+            
+            const availableDividends = document.getElementById('available-dividends');
+            
+            if (availableDividends) {
+                // Format the value with appropriate precision for small numbers
+                let formattedEarnings;
+                if (parseFloat(earningsInDoge) < 0.001) {
+                    // For very small numbers, use fixed decimal places instead of scientific notation
+                    formattedEarnings = parseFloat(earningsInDoge).toFixed(9);
+                    console.log("Using fixed notation for small value (backup):", formattedEarnings);
+                } else {
+                    formattedEarnings = parseFloat(earningsInDoge).toLocaleString(undefined, {
+                        minimumFractionDigits: 8,
+                        maximumFractionDigits: 8
+                    });
+                    console.log("Using locale string for normal value (backup):", formattedEarnings);
+                }
+                availableDividends.textContent = formattedEarnings;
+            }
+            
+            console.log("Backup RPC successful for checking dividends");
+        } catch (backupError) {
+            console.error("Error with backup RPC for checking dividends:", backupError);
+            const availableDividends = document.getElementById('available-dividends');
+            if (availableDividends) {
+                availableDividends.textContent = "Error loading";
+            }
+        }
     }
 }
 

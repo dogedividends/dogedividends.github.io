@@ -6,14 +6,13 @@ This repository contains the website for DogeD Token, a BSC token that rewards h
 
 The website now includes a seamless wallet connection experience that enables users to:
 
-1. Connect to Binance Smart Chain (BSC) via MetaMask or Phantom wallets
+1. Connect to Binance Smart Chain (BSC) via MetaMask
 2. View their available $DOGE dividends
 3. Claim dividends by calling the `_claimDividend` function on the smart contract
 
 ### Requirements for Users
 
 - **MetaMask**: The recommended wallet for BSC interactions. [Download MetaMask](https://metamask.io/download.html)
-- **Phantom**: Users can also connect with Phantom wallet's BSC support. [Download Phantom](https://phantom.app/download)
 
 ### Smart Contract
 
@@ -22,7 +21,7 @@ The DogeD token contract is deployed at: `0xfdac5dd5d3397c81b6fb3b659d8607e1ffac
 ### User Flow
 
 1. User visits the "Claim Dividends" section on the website
-2. User clicks on "Connect MetaMask" or "Connect Phantom" button
+2. User clicks on "Connect MetaMask" button
 3. If the wallet is not installed, the site prompts the user to install it
 4. Once connected, the site automatically:
    - Switches to BSC network (or prompts to add it if not configured)
@@ -36,8 +35,9 @@ The wallet connection feature uses:
 
 - Web3.js for blockchain interactions
 - MetaMask's Ethereum Provider API
-- Phantom's Solana and EVM APIs (when available)
 - ABI interface for the dividend contract
+- Enhanced formatting for small reward values (displays up to 9 decimal places for very small numbers)
+- Backup RPC support for improved reliability
 
 ### Development
 
