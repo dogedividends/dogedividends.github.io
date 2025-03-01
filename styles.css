@@ -1875,6 +1875,14 @@ footer {
     margin-bottom: 0;
 }
 
+.small-disclaimer {
+    font-size: 0.5rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 1rem;
+    text-align: center;
+    font-style: italic;
+}
+
 @media (max-width: 768px) {
     .disclaimer {
         margin: 2rem 0;
@@ -2281,16 +2289,15 @@ footer {
 }
 
 .check-result {
+    margin-top: 1rem;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    border: 1px solid rgba(255, 215, 0, 0.1);
-    text-align: center;
+    border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 .check-result p {
     margin: 0;
-    font-size: 0.95rem;
 }
 
 #wallet-total-rewards {
